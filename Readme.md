@@ -1,3 +1,4 @@
+#BluetoothConnectPi
 Do you travel a lot with your Pi?
 Are you scrambling for a display, keyboard and mouse when giving that customer demo?
 
