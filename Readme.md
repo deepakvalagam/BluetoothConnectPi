@@ -1,5 +1,3 @@
-# BluetoothConnectPi
-
 Do you travel a lot with your Pi?
 Are you scrambling for a display, keyboard and mouse when giving that customer demo?
 
@@ -14,4 +12,7 @@ What is more? The code is all available open-source on GitHub and you can clone 
 # Installation
 
   - Clone the repo to home/pi/Documents
-        'git clone https://github.com/vrdeepakprakash/BluetoothConnectPi.git'
+    ``` 
+    cd home/pi/Documents
+    git clone https://github.com/vrdeepakprakash/BluetoothConnectPi.git
+    ```
