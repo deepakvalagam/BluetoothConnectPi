@@ -1,0 +1,9 @@
+[Unit]
+Description=BTWifi
+
+[Service]
+ExecStart=/home/pi/Documents/Projects/Python_BT/bluetoothwifi.sh
+User=root
+
+[Install]
+WantedBy=multi-user.target
