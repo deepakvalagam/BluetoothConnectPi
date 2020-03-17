@@ -14,4 +14,4 @@ What is more? The code is all available open-source on GitHub and you can clone 
 # Installation
 
   - Clone the repo to home/pi/Documents
-        git clone https://github.com/vrdeepakprakash/BluetoothConnectPi.git
+        'git clone https://github.com/vrdeepakprakash/BluetoothConnectPi.git'
