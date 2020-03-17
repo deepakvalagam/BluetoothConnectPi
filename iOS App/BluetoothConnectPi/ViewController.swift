@@ -41,20 +41,24 @@ class ViewController: UIViewController {
                     input = self.passkeyField.text ?? "Empty"
                     if(input!.count >= 8){
                         data = Data(input!.utf8)
-                        self.peripheral.writeValue(data, for: self.writingCharacteristic, type: .withoutResponse)
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3, execute: {
+                    self.peripheral.writeValue(data, for: self.writingCharacteristic, type: .withoutResponse)
+                        self.detailsLabel.text = "Writing to Rpi... Waiting for response"
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
                             self.peripheral.readValue(for: self.readingCharacteristic)
                         })
                             
                     } else{
                         print("Password is not long enough")
+                        self.detailsLabel.text = "Password is not long enough"
                     }
                     })
             } else{
                 print("Bluetooth Error")
+                self.detailsLabel.text = "Bluetooth Error"
             }
         }else{
             print("SSID is empty")
+            self.detailsLabel.text = "SSID is empty"
         }
         
         
@@ -79,6 +83,7 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
             print("Central is not powered on")
         } else {
             print("Central scanning");
+            self.detailsLabel.text = "BT looking for RaspberryPi"
             centralManager.scanForPeripherals(withServices: [deviceUUID] , options:nil)
         }
     }
@@ -98,7 +103,8 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         if peripheral == self.peripheral {
-            print("Connected to RaspberryPi")
+            print("BT Connected to RaspberryPi")
+            self.detailsLabel.text = "BT Connected to RaspberryPi"
             peripheral.discoverServices([deviceUUID])
         }
     }
@@ -137,7 +143,7 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
             let SSID = detail.split(separator: ",")[0]
             let IP = detail.split(separator: ",")[1]
             print("SSID : ",SSID,"\nIP:",IP)
-            self.detailsLabel.text = "SSID : "+SSID+"\nIP:"+IP
+            self.detailsLabel.text = "RPi is connected to Wifi \nSSID : "+SSID+"\nIP:"+IP
         }
     }
     
