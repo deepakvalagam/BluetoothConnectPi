@@ -30,10 +30,23 @@ function execute(){
       console.log("SSID or Password Error! Not long enough")
       return
     }
-    var command = 'wpa_passphrase '+"\""+credentials[0]+"\" "+"\""+credentials[1]+"\""+'| sudo tee -a '+ "/etc/wpa_supplicant/wpa_supplicant.conf" +' > /dev/null'
+    var command = 'sed -i \'/^network/,$ d\' /etc/wpa_supplicant/wpa_supplicant.conf'
     console.log(command)
     const { exec } = require("child_process");
-    //let cmd = "sudo python3 /home/pi/Documents/Projects/Python_BT/BT_Wifi_Handler.py "+credentials[0]+","+credentials[1]
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+          console.log(`error: ${error.message}`);
+          return;
+      }
+      if (stderr) {
+          console.log(`stderr: ${stderr}`);
+          return;
+      }
+      console.log(`stdout: ${stdout}`);
+    });
+    
+    command = 'wpa_passphrase '+"\""+credentials[0]+"\" "+"\""+credentials[1]+"\""+'| sudo tee -a '+ "/etc/wpa_supplicant/wpa_supplicant.conf" +' > /dev/null'
+    console.log(command)
     exec(command, (error, stdout, stderr) => {
       if (error) {
           console.log(`error: ${error.message}`);
