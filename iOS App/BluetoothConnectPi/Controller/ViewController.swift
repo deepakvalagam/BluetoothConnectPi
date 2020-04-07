@@ -43,7 +43,7 @@ class ViewController: UIViewController {
                         data = Data(input!.utf8)
                     self.peripheral.writeValue(data, for: self.writingCharacteristic, type: .withoutResponse)
                         self.detailsLabel.text = "Writing to Rpi... Waiting for response"
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5, execute: {
                             self.peripheral.readValue(for: self.readingCharacteristic)
                         })
                             
@@ -84,7 +84,8 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
         } else {
             print("Central scanning");
             self.detailsLabel.text = "BT looking for RaspberryPi"
-            centralManager.scanForPeripherals(withServices: [deviceUUID] , options:nil)
+            //let CBCentralManagerScanOptionAllowDuplicatesKey: String = "true"
+            centralManager.scanForPeripherals(withServices: [deviceUUID] , options:[CBCentralManagerScanOptionAllowDuplicatesKey : true])
         }
     }
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
@@ -102,6 +103,7 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
     }
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        centralManager.stopScan()
         if peripheral == self.peripheral {
             print("BT Connected to RaspberryPi")
             self.detailsLabel.text = "BT Connected to RaspberryPi"
@@ -122,15 +124,21 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         if let characteristics = service.characteristics {
             for characteristic in characteristics {
+                print(characteristic.uuid)
                 if characteristic.properties.contains(.writeWithoutResponse){
                     print(characteristic.properties)
-                    self.writingCharacteristic = characteristic
+                    if(characteristic.uuid == CBUUID.init(string: "ffffffff-ffff-ffff-ffff-fffffffffff4")){
+                        self.writingCharacteristic = characteristic
+                    }
+                    
                 }else if characteristic.properties.contains(.read){
                     print(characteristic.properties)
-                    self.readingCharacteristic = characteristic
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
-                        self.peripheral.readValue(for: self.readingCharacteristic)
-                    })
+                    if(characteristic.uuid == CBUUID.init(string: "ffffffff-ffff-ffff-ffff-fffffffffff2")){
+                        self.readingCharacteristic = characteristic
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                            self.peripheral.readValue(for: self.readingCharacteristic)
+                        })
+                    }
                 }
             }
         }
@@ -144,13 +152,18 @@ extension ViewController: CBPeripheralDelegate, CBCentralManagerDelegate{
             let IP = detail.split(separator: ",")[1]
             print("SSID : ",SSID,"\nIP:",IP)
             self.detailsLabel.text = "RPi is connected to Wifi \nSSID : "+SSID+"\nIP:"+IP
+            //self.centralManager.cancelPeripheralConnection(peripheral)
         }
     }
     
     func centralManager(_ central: CBCentralManager,didDisconnectPeripheral peripheral: CBPeripheral,error: Error?){
         print("Disconnected ",error ?? "NO ERROR")
         print("Central scanning");
-        centralManager.scanForPeripherals(withServices: [deviceUUID] , options:nil)
+        self.detailsLabel.text = "RPi disconnected. Scanning..."
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: {
+            self.centralManager.scanForPeripherals(withServices: [self.deviceUUID] , options:[CBCentralManagerScanOptionAllowDuplicatesKey : true])
+        })
+        
         
     }
     
